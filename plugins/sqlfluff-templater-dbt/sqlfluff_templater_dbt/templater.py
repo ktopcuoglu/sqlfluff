@@ -188,7 +188,7 @@ class DbtTemplater(JinjaTemplater):
                 profiles_dir=self.profiles_dir,
                 profile=self._get_profile(),
                 vars=cli_vars,
-                threads=1,
+                threads=10,
             ),
             user_config,
         )
@@ -199,7 +199,7 @@ class DbtTemplater(JinjaTemplater):
                 profile=self._get_profile(),
                 target=self._get_target(),
                 vars=cli_vars,
-                threads=1,
+                threads=10,
             )
         )
 
