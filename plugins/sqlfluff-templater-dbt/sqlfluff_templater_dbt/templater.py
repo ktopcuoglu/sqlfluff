@@ -150,20 +150,15 @@ class DbtTemplater(JinjaTemplater):
             except ImportError:
                 pass
 
-    def _get_dbt_threads(self):
+    def _get_dbt_threads(self, project_dir, profile_name):
         # Load the dbt profile
         from dbt.config.runtime import load_profile
-        from argparse import Namespace
-        #from dbt.config.profile import read_profile
-        from dbt.flags import set_flags
 
-        #set_flags(Namespace(USE_COLORS=True, MACRO_DEBUGGING=False))
-
-        #profile_str = read_profile(self._get_profiles_dir())
+        # 1.5.x+ this is a dict.
         cli_vars = self._get_cli_vars() if self.dbt_version_tuple >= (1, 5) else str(self._get_cli_vars())
-        dbt_profile = load_profile(project_root=self._get_project_dir(),
+        dbt_profile = load_profile(project_root=project_dir,
                                     cli_vars=cli_vars,
-                                    profile_name_override=self._get_profile())
+                                    profile_name_override=profile_name)
         return dbt_profile.threads
 
     @cached_property
@@ -200,14 +195,12 @@ class DbtTemplater(JinjaTemplater):
             # Pre 1.5.x this is a string.
             cli_vars = str(self._get_cli_vars())
 
-        #myr = self._get_dbt_threads()
         flags.set_from_args(
             DbtConfigArgs(
                 project_dir=self.project_dir,
                 profiles_dir=self.profiles_dir,
                 profile=self._get_profile(),
-                vars=cli_vars,
-                threads=1,
+                vars=cli_vars
             ),
             user_config,
         )
@@ -219,7 +212,7 @@ class DbtTemplater(JinjaTemplater):
                 profile=self._get_profile(),
                 target=self._get_target(),
                 vars=cli_vars,
-                threads=self._get_dbt_threads(),
+                threads=self._get_dbt_threads(self.project_dir, self._get_profile()),
             )
         )
 
